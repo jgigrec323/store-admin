@@ -65,7 +65,7 @@ export default function StoreSwicther({
           className={cn("w-[200px] justify-between", className)}
         >
           <StoreIcon className="mr-2 h-4 w-4" />
-          Current Store
+          {currentStore?.label}
           <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50"></ChevronsUpDown>
         </Button>
       </PopoverTrigger>
@@ -104,7 +104,7 @@ export default function StoreSwicther({
                   storeModal.onOpen();
                 }}
               >
-                <PlusCircle className="mr-2 h-5 w5" />
+                <PlusCircle className="mr-2 h-5 w-5" />
                 Create Store
               </CommandItem>
             </CommandGroup>
