@@ -3,7 +3,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
-import { Billboard } from "@prisma/client";
+import { Image, Product } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,40 +21,56 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { AlertModal } from "@/components/modals/alert-modal";
-import { useOrigin } from "@/hooks/use-origin";
 import ImageUpload from "@/components/ui/image-upload";
 
-interface BillboardFormProps {
-  initialData: Billboard | null;
+interface ProductFormProps {
+  initialData:
+    | (Product & {
+        images: Image[];
+      })
+    | null;
 }
 const formSchema = z.object({
-  label: z.string().min(1),
-  imageUrl: z.string().min(1),
+  name: z.string().min(1),
+  images: z.object({ url: z.string() }).array(),
+  price: z.coerce.number().min(1),
+  categoryId: z.string().min(1),
+  colorId: z.string().min(1),
+  sizeId: z.string().min(1),
+  isFeatured: z.boolean().default(false).optional(),
+  isArchived: z.boolean().default(false).optional(),
 });
 
-type BillboardFormValues = z.infer<typeof formSchema>;
+type ProductFormValues = z.infer<typeof formSchema>;
 
-export const BillboardForm: React.FC<BillboardFormProps> = ({
-  initialData,
-}) => {
+export const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const params = useParams();
   const router = useRouter();
 
-  const title = initialData ? "Edit Billboard" : "Create Billboard";
-  const description = initialData ? "Edit Billboard" : "Add a new Billboard";
-  const toastMessage = initialData
-    ? "Billboard updated."
-    : "Billboard created.";
+  const title = initialData ? "Edit Product" : "Create Product";
+  const description = initialData ? "Edit Product" : "Add a new Product";
+  const toastMessage = initialData ? "Product updated." : "Product created.";
   const action = initialData ? "Save changes" : "Create";
 
-  const form = useForm<BillboardFormValues>({
+  const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || { label: "", imageUrl: "" },
+    defaultValues: initialData
+      ? { ...initialData, price: parseFloat(String(initialData?.price)) }
+      : {
+          name: "",
+          images: [],
+          price: 0,
+          categoryId: "",
+          colorId: "",
+          sizeId: "",
+          isFeatured: false,
+          isArchived: false,
+        },
   });
 
-  const onSubmit = async (data: BillboardFormValues) => {
+  const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
       if (initialData) {
