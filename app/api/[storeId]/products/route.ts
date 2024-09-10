@@ -100,9 +100,7 @@ export async function POST (req:Request,
                storeId : params.storeId,
                images:{
                 createMany:{
-                    data:{
-                        ...images.map((image:{url:string})=>image)
-                    }
+                    data:images,
                 }
                }
             }

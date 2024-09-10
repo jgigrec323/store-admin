@@ -42,6 +42,7 @@ interface ProductFormProps {
   colors: Color[];
   sizes: Size[];
 }
+
 const formSchema = z.object({
   name: z.string().min(1),
   images: z.object({ url: z.string() }).array(),
@@ -89,6 +90,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
+      console.log("images" + data.images);
       setLoading(true);
       if (initialData) {
         await axios.patch(
@@ -121,7 +123,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       setLoading(false);
     }
   };
-  //TODO:have to fix the multiples images upload
+
   return (
     <>
       <AlertModal
@@ -157,22 +159,24 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 <FormLabel>Images</FormLabel>
                 <FormControl>
                   <ImageUpload
-                    disabled={loading}
-                    onChange={(url) =>
-                      field.onChange([...field.value, { url }])
-                    }
-                    onRemove={(url) =>
-                      field.onChange([
-                        ...field.value.filter((current) => current.url !== url),
-                      ])
-                    }
                     value={field.value.map((image) => image.url)}
+                    disabled={loading}
+                    onChange={(url) => {
+                      field.onChange([...field.value, { url }]);
+                    }}
+                    onRemove={(url) => {
+                      field.onChange(
+                        field.value.filter((current) => current.url !== url)
+                      );
+                      console.log(field);
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
