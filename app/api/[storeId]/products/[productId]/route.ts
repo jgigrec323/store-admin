@@ -1,5 +1,6 @@
 import prismadb from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
+import { Image } from "@prisma/client";
 import { NextResponse } from "next/server"
 
 export async function GET (
@@ -104,19 +105,17 @@ export async function PATCH (
         })
 
         const product = await prismadb.product.update({
-            where:{
-                id:params.productId,
+            where: {
+              id:params.productId,
             },
-            data:{
-                images:{
-                    createMany:{
-                        data:{
-                            ...images.map((image:{url:string})=>image)
-                        }
-                    }
-                   }
+            data: {
+              images: {
+                createMany: {
+                  data: images.map((image:Image) => ({ url: image.url }))  // Ensure this is an array of objects
+                }
+              }
             }
-        })
+          });    
 
         return NextResponse.json(product)
     } catch (error) {

@@ -90,7 +90,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
-      console.log("images" + data.images);
       setLoading(true);
       if (initialData) {
         await axios.patch(
@@ -100,8 +99,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       } else {
         await axios.post(`/api/${params.storeId}/products`, data);
       }
-      router.refresh();
       router.push(`/${params.storeId}/products`);
+      router.refresh();
       toast.success(toastMessage);
     } catch (error) {
       toast.error("Something went wrong");
@@ -114,13 +113,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     try {
       setLoading(true);
       await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
-      router.refresh();
+
       router.push(`/${params.storeId}/products`);
-      toast.success("Product deleted");
-    } catch (error) {
-      toast.error("Something went wrong");
+      toast.success("Product deleted.");
+      router.refresh();
+    } catch (error: any) {
+      toast.error("Something went wrong.");
     } finally {
       setLoading(false);
+      setOpen(false);
     }
   };
 
@@ -161,15 +162,16 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   <ImageUpload
                     value={field.value.map((image) => image.url)}
                     disabled={loading}
-                    onChange={(url) => {
-                      field.onChange([...field.value, { url }]);
-                    }}
-                    onRemove={(url) => {
-                      field.onChange(
-                        field.value.filter((current) => current.url !== url)
-                      );
-                      console.log(field);
-                    }}
+                    onChange={(url) =>
+                      field.onChange([...field.value, { url }])
+                    }
+                    onRemove={(url) =>
+                      field.onChange([
+                        ...field.value.filter(
+                          (current: any) => current.url !== url
+                        ),
+                      ])
+                    }
                   />
                 </FormControl>
                 <FormMessage />
